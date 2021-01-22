@@ -20,8 +20,8 @@ router.get('/', (req, res) => {
   );
 });
 
-router.delete('/', (req, res) => {
-  const postsWithId = { where: { id: req.body.id } };
+router.delete('/:id', (req, res) => {
+  const postsWithId = { where: { id: req.params.id } };
   models.Post.findAll({
     ...postsWithId,
     attributes: ['id', 'name', 'description'],
