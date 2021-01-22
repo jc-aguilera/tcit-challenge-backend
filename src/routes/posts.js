@@ -1,19 +1,34 @@
 import { Router } from 'express';
+import models from '../models';
 
 const router = Router();
 
 router.post('/', (req, res) => {
-  console.info(req.body);
-  res.json({ message: 'Post created' });
+  const { name, description } = req.body;
+  models.Post.create({ name, description })
+    .then(() =>
+      models.Post.findAll({ attributes: ['id', 'name', 'description'] })
+    )
+    .then((posts) => res.json(posts));
 });
 
 router.get('/', (req, res) => {
-  res.json([{ id: 4, name: 'slkdjhf', description: 'Lorem ipsum 1' }]);
+  models.Post.findAll({ attributes: ['id', 'name', 'description'] }).then(
+    (posts) => {
+      res.json(posts);
+    }
+  );
 });
 
-router.delete('/:postId', (req, res) => {
-  const { postId } = req.params;
-  res.json({ postId });
+router.delete('/', (req, res) => {
+  const postsWithId = { where: { id: req.body.id } };
+  models.Post.findAll({
+    ...postsWithId,
+    attributes: ['id', 'name', 'description'],
+  }).then(async ([post]) => {
+    await models.Post.destroy(postsWithId);
+    res.json(post);
+  });
 });
 
 export default router;
