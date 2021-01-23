@@ -5,11 +5,11 @@ const router = Router();
 
 router.post('/', (req, res) => {
   const { name, description } = req.body;
-  models.Post.create({ name, description })
-    .then(() =>
-      models.Post.findAll({ attributes: ['id', 'name', 'description'] })
-    )
-    .then((posts) => res.json(posts));
+  models.Post.create({ name, description }).then(
+    ({ id, name, description }) => {
+      res.status(201).json({ id, name, description });
+    }
+  );
 });
 
 router.get('/', (req, res) => {
@@ -27,6 +27,7 @@ router.delete('/:id', (req, res) => {
     attributes: ['id', 'name', 'description'],
   }).then(async ([post]) => {
     await models.Post.destroy(postsWithId);
+    // Challenge asks for content to be returned after deleting a post, so no HTTP 204
     res.json(post);
   });
 });
